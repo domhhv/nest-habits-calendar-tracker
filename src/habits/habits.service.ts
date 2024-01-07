@@ -38,7 +38,10 @@ export class HabitsService {
   }
 
   update(id: number, updateHabitDto: UpdateHabitDto) {
-    return this.habitsRepository.update(id, updateHabitDto);
+    return this.habitsRepository.save({
+      id: +id,
+      ...updateHabitDto,
+    });
   }
 
   async remove(id: number) {

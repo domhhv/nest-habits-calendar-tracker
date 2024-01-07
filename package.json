@@ -1,8 +1,8 @@
 {
   "name": "nest-habits-calendar-tracker",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "author": "Dominik Hryshaiev <domhryshaiev@gmail.com>",
+  "description": "API for tracking habits and calendar events, built with Nest.js",
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
