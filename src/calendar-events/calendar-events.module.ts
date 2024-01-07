@@ -9,5 +9,6 @@ import { HabitsModule } from '../habits/habits.module';
   imports: [TypeOrmModule.forFeature([CalendarEvent]), HabitsModule],
   controllers: [CalendarEventsController],
   providers: [CalendarEventsService],
+  exports: [CalendarEventsService],
 })
 export class CalendarEventsModule {}
