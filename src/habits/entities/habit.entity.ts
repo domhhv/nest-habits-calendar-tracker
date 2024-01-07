@@ -26,7 +26,9 @@ export class Habit {
   @Column()
   trait: HabitTraits;
 
-  @OneToMany(() => CalendarEvent, (calendarEvent) => calendarEvent.habit)
+  @OneToMany(() => CalendarEvent, (calendarEvent) => calendarEvent.habit, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ referencedColumnName: 'id' })
   calendarEvents: CalendarEvent[];
 }
