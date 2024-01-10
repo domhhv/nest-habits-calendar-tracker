@@ -5,20 +5,20 @@ import appConfig from './config/app.config';
 import { DatabaseModule } from './database/database.module';
 import { HabitsModule } from './habits/habits.module';
 import { CalendarEventsModule } from './calendar-events/calendar-events.module';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       load: [appConfig],
+      envFilePath:
+        process.env.NODE_ENV === 'development' ? '.env' : '.env.production',
     }),
     TypeOrmModule.forRootAsync({
       useFactory: () => ({
         type: 'postgres',
-        host: process.env.DATABASE_HOST,
-        port: Number(process.env.DATABASE_PORT),
-        username: process.env.DATABASE_USER,
-        password: process.env.DATABASE_PASSWORD,
-        database: process.env.DATABASE_NAME,
+        url: process.env.DATABASE_URL,
         autoLoadEntities: true,
         synchronize: true,
       }),
@@ -26,6 +26,8 @@ import { CalendarEventsModule } from './calendar-events/calendar-events.module';
     DatabaseModule,
     HabitsModule,
     CalendarEventsModule,
+    AuthModule,
+    UsersModule,
   ],
 })
 export class AppModule {}
