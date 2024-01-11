@@ -29,14 +29,16 @@ export class UsersService {
     return this.usersRepository.find();
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
+  async update(username: string, updateUserDto: UpdateUserDto) {
+    const { id } = await this.findOne(username);
+
     return this.usersRepository.save({
       id: +id,
       ...updateUserDto,
     });
   }
 
-  remove(id: number) {
-    return this.usersRepository.delete(id);
+  remove(username: string) {
+    return this.usersRepository.delete({ username });
   }
 }

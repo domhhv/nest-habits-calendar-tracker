@@ -13,7 +13,7 @@ export class CalendarEventsService {
     private habitsService: HabitsService,
   ) {}
 
-  async create(createCalendarEventDto: CreateCalendarEventDto) {
+  async create(createCalendarEventDto: CreateCalendarEventDto, userId: number) {
     try {
       const habit = await this.habitsService.findOne(
         createCalendarEventDto.habit,
@@ -22,6 +22,7 @@ export class CalendarEventsService {
       const calendarEvent = this.calendarEventRepository.create({
         ...createCalendarEventDto,
         habit,
+        user: { id: userId },
       });
 
       return this.calendarEventRepository.save(calendarEvent);
@@ -30,8 +31,13 @@ export class CalendarEventsService {
     }
   }
 
-  findAll() {
+  findAll(userId: number) {
     return this.calendarEventRepository.find({
+      where: {
+        user: {
+          id: userId,
+        },
+      },
       relations: ['habit'],
     });
   }

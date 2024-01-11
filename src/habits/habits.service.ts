@@ -15,14 +15,23 @@ export class HabitsService {
     private readonly calendarEventRepository: Repository<CalendarEvent>,
   ) {}
 
-  async create(createHabitDto: CreateHabitDto) {
-    const habit = this.habitsRepository.create(createHabitDto);
+  async create(createHabitDto: CreateHabitDto, userId: number) {
+    const habit = this.habitsRepository.create({
+      ...createHabitDto,
+      user: { id: userId },
+    });
 
     return this.habitsRepository.save(habit);
   }
 
-  findAll() {
-    return this.habitsRepository.find();
+  findAll(userId: number) {
+    return this.habitsRepository.find({
+      where: {
+        user: {
+          id: userId,
+        },
+      },
+    });
   }
 
   async findOne(id: number) {
