@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import appConfig from './config/app.config';
 import { DatabaseModule } from './database/database.module';
 import { HabitsModule } from './habits/habits.module';
 import { CalendarEventsModule } from './calendar-events/calendar-events.module';
@@ -11,7 +10,6 @@ import { UsersModule } from './users/users.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      load: [appConfig],
       envFilePath:
         process.env.NODE_ENV === 'development' ? '.env' : '.env.production',
     }),
