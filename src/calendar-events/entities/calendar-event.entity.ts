@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Habit } from '../../habits/entities/habit.entity';
+import { User } from '../../users/entities/user.entity';
 
 @Entity()
 export class CalendarEvent {
@@ -18,4 +19,8 @@ export class CalendarEvent {
   @ManyToOne(() => Habit, (habit) => habit.calendarEvents)
   @JoinColumn({ name: 'habit_id', referencedColumnName: 'id' })
   habit: Habit;
+
+  @ManyToOne(() => User, (user) => user.calendarEvents)
+  @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
+  user: User;
 }
