@@ -7,7 +7,9 @@ import {
   Param,
   Delete,
   UseGuards,
+  Req,
 } from '@nestjs/common';
+import type { Request } from 'express';
 import { HabitsService } from './habits.service';
 import { CreateHabitDto } from './dto/create-habit.dto';
 import { UpdateHabitDto } from './dto/update-habit.dto';
@@ -19,13 +21,13 @@ export class HabitsController {
   constructor(private readonly habitsService: HabitsService) {}
 
   @Post()
-  create(@Body() createHabitDto: CreateHabitDto) {
-    return this.habitsService.create(createHabitDto);
+  create(@Req() request: Request, @Body() createHabitDto: CreateHabitDto) {
+    return this.habitsService.create(createHabitDto, request['user'].sub);
   }
 
   @Get()
-  findAll() {
-    return this.habitsService.findAll();
+  findAll(@Req() request: Request) {
+    return this.habitsService.findAll(request['user'].sub);
   }
 
   @Get(':id')
