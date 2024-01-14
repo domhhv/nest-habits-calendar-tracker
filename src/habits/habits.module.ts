@@ -5,8 +5,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Habit } from './entities/habit.entity';
 import { CalendarEvent } from '../calendar-events/entities/calendar-event.entity';
 import { User } from '../users/entities/user.entity';
-import { APP_GUARD } from '@nestjs/core';
-import { AuthGuard } from '../auth/auth.guard';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Habit, CalendarEvent, User])],
