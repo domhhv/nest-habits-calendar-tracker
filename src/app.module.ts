@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from './database/database.module';
@@ -6,12 +6,16 @@ import { HabitsModule } from './habits/habits.module';
 import { CalendarEventsModule } from './calendar-events/calendar-events.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import AuthConfig from './auth/auth.config';
+import { AppLoggerMiddleware } from './common/middlewares/app-logging.middleware';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
+      isGlobal: true,
       envFilePath:
         process.env.NODE_ENV === 'development' ? '.env' : '.env.production',
+      load: [AuthConfig],
     }),
     TypeOrmModule.forRootAsync({
       useFactory: () => ({
@@ -28,4 +32,8 @@ import { UsersModule } from './users/users.module';
     UsersModule,
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): void {
+    consumer.apply(AppLoggerMiddleware).forRoutes('*');
+  }
+}
