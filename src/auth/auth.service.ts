@@ -13,57 +13,46 @@ export class AuthService {
     private configService: ConfigService<AuthConfigType>,
   ) {}
 
-  async signUp(username: string, password: string): Promise<any> {
-    try {
-      const user = await this.usersService.create({
-        username,
-        password,
-      });
+  async register(username: string, password: string): Promise<any> {
+    const existingUser = await this.usersService.findOne(username);
 
-      delete user.password;
-
-      const payload = { sub: user.id, username: user.username };
-
-      return {
-        access_token: await this.jwtService.signAsync(payload, {
-          secret: this.configService.get('JWT_SECRET'),
-        }),
-        signedUp: true,
-        user,
-      };
-    } catch (error) {
-      console.log(error);
+    if (existingUser) {
+      throw new UnauthorizedException('Username already exists');
     }
+
+    const user = await this.usersService.create({
+      username,
+      password,
+    });
+
+    delete user.password;
+
+    return user;
   }
 
-  async signIn(username: string, password: string): Promise<any> {
-    try {
-      const existingUser = await this.usersService.findOne(username);
+  async validateLogin(username: string, password: string): Promise<any> {
+    const existingUser = await this.usersService.findOne(username);
 
-      if (!existingUser) {
-        return this.signUp(username, password);
-      }
-
-      const isPasswordMatching = await bcrypt.compare(
-        password,
-        existingUser.password,
-      );
-
-      if (!isPasswordMatching) {
-        throw new UnauthorizedException('Wrong password');
-      }
-
-      const payload = { sub: existingUser.id, username: existingUser.username };
-
-      return {
-        access_token: await this.jwtService.signAsync(payload, {
-          secret: this.configService.get('JWT_SECRET'),
-        }),
-        loggedIn: true,
-        user: existingUser,
-      };
-    } catch (error) {
-      console.log(error);
+    if (!existingUser) {
+      throw new UnauthorizedException('Wrong username');
     }
+
+    const isPasswordMatching = await bcrypt.compare(
+      password,
+      existingUser.password,
+    );
+
+    if (!isPasswordMatching) {
+      throw new UnauthorizedException('Wrong password');
+    }
+
+    const payload = { sub: existingUser.id };
+
+    return {
+      token: await this.jwtService.signAsync(payload, {
+        secret: this.configService.get('JWT_SECRET'),
+      }),
+      ...existingUser,
+    };
   }
 }
