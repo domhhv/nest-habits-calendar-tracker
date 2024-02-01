@@ -6,41 +6,42 @@ import {
   Param,
   Delete,
   UseGuards,
-  Req,
 } from '@nestjs/common';
 import { CalendarEventsService } from './calendar-events.service';
 import { CreateCalendarEventDto } from './dto/create-calendar-event.dto';
-import { AuthGuard } from '../auth/auth.guard';
-import { Request } from 'express';
+import { AuthGuard } from '../common/guards/auth.guard';
 
 @UseGuards(AuthGuard)
-@Controller('calendar-events')
+@Controller('users/:userId/calendar-events')
 export class CalendarEventsController {
   constructor(private readonly calendarEventsService: CalendarEventsService) {}
 
   @Post()
   create(
-    @Req() request: Request,
+    @Param('userId') userId: number,
     @Body() createCalendarEventDto: CreateCalendarEventDto,
   ) {
-    return this.calendarEventsService.create(
-      createCalendarEventDto,
-      request['user'].sub,
-    );
+    return this.calendarEventsService.create(createCalendarEventDto, userId);
   }
 
   @Get()
-  findAll(@Req() request: Request) {
-    return this.calendarEventsService.findAll(request['user'].sub);
+  findAll(@Param('userId') userId: number) {
+    return this.calendarEventsService.findAll(userId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.calendarEventsService.findOne(+id);
+  @Get(':calendarEventId')
+  findOne(
+    @Param('userId') userId: number,
+    @Param('calendarEventId') calendarEventId: number,
+  ) {
+    return this.calendarEventsService.findOne(userId, calendarEventId);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.calendarEventsService.remove(+id);
+  @Delete(':calendarEventId')
+  remove(
+    @Param('userId') userId: number,
+    @Param('calendarEventId') calendarEventId: number,
+  ) {
+    return this.calendarEventsService.remove(userId, calendarEventId);
   }
 }

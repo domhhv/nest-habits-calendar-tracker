@@ -6,7 +6,7 @@ import { HabitsModule } from './habits/habits.module';
 import { CalendarEventsModule } from './calendar-events/calendar-events.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
-import AuthConfig from './auth/auth.config';
+import AuthConfig from './common/config/auth.config';
 import { AppLoggerMiddleware } from './common/middlewares/app-logging.middleware';
 
 @Module({

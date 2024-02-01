@@ -7,41 +7,49 @@ import {
   Param,
   Delete,
   UseGuards,
-  Req,
 } from '@nestjs/common';
-import type { Request } from 'express';
 import { HabitsService } from './habits.service';
 import { CreateHabitDto } from './dto/create-habit.dto';
 import { UpdateHabitDto } from './dto/update-habit.dto';
-import { AuthGuard } from '../auth/auth.guard';
+import { AuthGuard } from '../common/guards/auth.guard';
 
-@UseGuards(AuthGuard)
-@Controller('habits')
+@Controller('users/:userId/habits')
 export class HabitsController {
   constructor(private readonly habitsService: HabitsService) {}
 
   @Post()
-  create(@Req() request: Request, @Body() createHabitDto: CreateHabitDto) {
-    return this.habitsService.create(createHabitDto, request['user'].sub);
+  create(
+    @Param('userId') userId: number,
+    @Body() createHabitDto: CreateHabitDto,
+  ) {
+    return this.habitsService.create(createHabitDto, userId);
   }
 
+  @UseGuards(AuthGuard)
   @Get()
-  findAll(@Req() request: Request) {
-    return this.habitsService.findAll(request['user'].sub);
+  findAll(@Param('userId') userId: number) {
+    return this.habitsService.findAll(userId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.habitsService.findOne(+id);
+  @Get(':habitId')
+  findOne(@Param('userId') userId: number, @Param('habitId') habitId: number) {
+    return this.habitsService.findOne(userId, habitId);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateHabitDto: UpdateHabitDto) {
-    return this.habitsService.update(+id, updateHabitDto);
+  @Patch(':habitId')
+  update(
+    @Param('userId') userId: number,
+    @Param('habitId') habitId: number,
+    @Body() updateHabitDto: UpdateHabitDto,
+  ) {
+    return this.habitsService.update(userId, habitId, updateHabitDto);
   }
 
-  @Delete(':id')
-  async remove(@Param('id') id: string) {
-    return this.habitsService.remove(+id);
+  @Delete(':habitId')
+  async remove(
+    @Param('userId') userId: number,
+    @Param('habitId') habitId: number,
+  ) {
+    return this.habitsService.remove(userId, habitId);
   }
 }

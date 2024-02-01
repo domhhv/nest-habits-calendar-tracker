@@ -1,8 +1,8 @@
-import { IsDate, IsInt } from 'class-validator';
+import { IsInt, IsString } from 'class-validator';
 
 export class CreateCalendarEventDto {
-  @IsDate()
-  readonly date: Date;
+  @IsString()
+  readonly date: string;
 
   @IsInt()
   readonly habit: number;

@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateCalendarEventDto } from './dto/create-calendar-event.dto';
 import { CalendarEvent } from './entities/calendar-event.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,21 +18,18 @@ export class CalendarEventsService {
   ) {}
 
   async create(createCalendarEventDto: CreateCalendarEventDto, userId: number) {
-    try {
-      const habit = await this.habitsService.findOne(
-        createCalendarEventDto.habit,
-      );
+    const habit = await this.habitsService.findOne(
+      userId,
+      createCalendarEventDto.habit,
+    );
 
-      const calendarEvent = this.calendarEventRepository.create({
-        ...createCalendarEventDto,
-        habit,
-        user: { id: userId },
-      });
+    const calendarEvent = this.calendarEventRepository.create({
+      ...createCalendarEventDto,
+      habit,
+      user: { id: userId },
+    });
 
-      return this.calendarEventRepository.save(calendarEvent);
-    } catch (e) {
-      throw new Error(e);
-    }
+    return this.calendarEventRepository.save(calendarEvent);
   }
 
   findAll(userId: number) {
@@ -42,15 +43,36 @@ export class CalendarEventsService {
     });
   }
 
-  findOne(id: number) {
-    return this.calendarEventRepository.findOneOrFail({
+  async findOne(userId: number, calendarEventId: number) {
+    const calendarEvent = await this.calendarEventRepository.findOne({
       where: {
-        id,
+        id: calendarEventId,
+      },
+      relations: ['user'],
+    });
+
+    if (!calendarEvent) {
+      throw new NotFoundException(
+        `Calendar event #${calendarEventId} for user #${userId} not found`,
+      );
+    }
+
+    if (calendarEvent.user.id !== userId) {
+      throw new UnauthorizedException(
+        `User #${userId} is not authorized to access calendar event #${calendarEventId}`,
+      );
+    }
+
+    return this.calendarEventRepository.findOne({
+      where: {
+        id: calendarEventId,
       },
     });
   }
 
-  remove(id: number) {
-    return this.calendarEventRepository.delete(id);
+  async remove(userId: number, calendarEventId: number) {
+    await this.findOne(userId, calendarEventId);
+
+    return this.calendarEventRepository.delete(calendarEventId);
   }
 }
