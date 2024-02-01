@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateHabitDto } from './dto/create-habit.dto';
 import { UpdateHabitDto } from './dto/update-habit.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -31,33 +35,56 @@ export class HabitsService {
           id: userId,
         },
       },
+      relations: ['user'],
     });
   }
 
-  async findOne(id: number) {
+  async findOne(userId: number, habitId: number) {
     const habit = await this.habitsRepository.findOne({
-      where: { id: +id },
+      where: { id: habitId },
+      relations: ['user'],
     });
 
     if (!habit) {
-      throw new NotFoundException(`Habit #${id} not found`);
+      throw new NotFoundException(
+        `Habit #${habitId} for user #${userId} not found`,
+      );
+    }
+
+    if (habit.user.id !== userId) {
+      throw new UnauthorizedException(
+        `User #${userId} is not authorized to access habit #${habitId}`,
+      );
     }
 
     return habit;
   }
 
-  update(id: number, updateHabitDto: UpdateHabitDto) {
-    return this.habitsRepository.save({
-      id: +id,
+  async update(
+    userId: number,
+    habitId: number,
+    updateHabitDto: UpdateHabitDto,
+  ) {
+    const habit = await this.findOne(userId, habitId);
+
+    await this.habitsRepository.update(habitId, {
+      ...habit,
       ...updateHabitDto,
     });
+
+    return this.findOne(userId, habitId);
   }
 
-  async remove(id: number) {
+  async remove(userId: number, habitId: number) {
+    await this.findOne(userId, habitId);
+
     const calendarEvents = await this.calendarEventRepository.find({
       where: {
         habit: {
-          id,
+          id: habitId,
+        },
+        user: {
+          id: userId,
         },
       },
     });
@@ -67,7 +94,8 @@ export class HabitsService {
         this.calendarEventRepository.delete(calendarEvent.id),
       ),
     );
-    const habit = await this.findOne(id);
+
+    const habit = await this.findOne(userId, habitId);
     return this.habitsRepository.remove(habit);
   }
 }

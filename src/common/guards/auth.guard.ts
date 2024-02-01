@@ -7,7 +7,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { ConfigService } from '@nestjs/config';
-import { AuthConfigType } from './auth.config';
+import { AuthConfigType } from '../config/auth.config';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -19,18 +19,18 @@ export class AuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
-
     if (!token) {
       throw new UnauthorizedException();
     }
 
     try {
-      const payload = await this.jwtService.verifyAsync(token, {
+      const { sub } = await this.jwtService.verifyAsync(token, {
         secret: this.configService.get('JWT_SECRET'),
       });
-      // 💡 We're assigning the payload to the request object here
-      // so that we can access it in our route handlers
-      request['user'] = payload;
+
+      const { userId } = request.params;
+
+      return sub === +userId;
     } catch (e) {
       if (e.message === 'jwt expired') {
         throw new UnauthorizedException('Token expired');
