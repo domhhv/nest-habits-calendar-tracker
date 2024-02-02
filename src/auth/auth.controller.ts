@@ -27,7 +27,7 @@ export class AuthController {
   }
 
   @Post('tokens/access/regenerate')
-  async refresh(@Body() body: RefreshTokensDto) {
+  async regenerateAccessToken(@Body() body: RefreshTokensDto) {
     return this.authService.regenerateAccessToken(body.refreshToken);
   }
 }
