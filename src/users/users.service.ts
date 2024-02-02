@@ -11,7 +11,15 @@ export class UsersService {
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
   ) {}
 
-  async findOne(username: string): Promise<User | undefined> {
+  async findOne(id: number): Promise<User | undefined> {
+    return this.usersRepository.findOneOrFail({
+      where: {
+        id,
+      },
+    });
+  }
+
+  async findOneByUsername(username: string): Promise<User | undefined> {
     return this.usersRepository.findOne({
       where: {
         username,
@@ -29,16 +37,16 @@ export class UsersService {
     return this.usersRepository.find();
   }
 
-  async update(username: string, updateUserDto: UpdateUserDto) {
-    const { id } = await this.findOne(username);
+  async update(userId: number, updateUserDto: UpdateUserDto) {
+    const { id } = await this.findOne(userId);
 
     return this.usersRepository.save({
-      id: +id,
+      id,
       ...updateUserDto,
     });
   }
 
-  remove(username: string) {
-    return this.usersRepository.delete({ username });
+  remove(id: number) {
+    return this.usersRepository.delete({ id });
   }
 }

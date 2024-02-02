@@ -5,5 +5,5 @@ export class CreateCalendarEventDto {
   readonly date: string;
 
   @IsInt()
-  readonly habit: number;
+  readonly habitId: number;
 }
