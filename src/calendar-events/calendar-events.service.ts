@@ -20,7 +20,7 @@ export class CalendarEventsService {
   async create(createCalendarEventDto: CreateCalendarEventDto, userId: number) {
     const habit = await this.habitsService.findOne(
       userId,
-      createCalendarEventDto.habit,
+      createCalendarEventDto.habitId,
     );
 
     const calendarEvent = this.calendarEventRepository.create({
