@@ -16,6 +16,9 @@ export class CalendarEvent {
   @Column({ type: 'timestamptz' })
   date: Date;
 
+  @Column({ type: 'text', nullable: true })
+  note: string;
+
   @ManyToOne(() => Habit, (habit) => habit.calendarEvents)
   @JoinColumn({ name: 'habit_id', referencedColumnName: 'id' })
   habit: Habit;
