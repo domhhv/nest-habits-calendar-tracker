@@ -6,6 +6,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Patch,
 } from '@nestjs/common';
 import { CalendarEventsService } from './calendar-events.service';
 import { CreateCalendarEventDto } from './dto/create-calendar-event.dto';
@@ -35,6 +36,15 @@ export class CalendarEventsController {
     @Param('calendarEventId') calendarEventId: number,
   ) {
     return this.calendarEventsService.findOne(userId, calendarEventId);
+  }
+
+  @Patch(':calendarEventId')
+  update(
+    @Param('userId') userId: number,
+    @Param('calendarEventId') calendarEventId: number,
+    // @Body() updateCalendarEventDto: CreateCalendarEventDto,
+  ) {
+    return `This action updates a #${calendarEventId} calendarEvent of user #${userId}`;
   }
 
   @Delete(':calendarEventId')
