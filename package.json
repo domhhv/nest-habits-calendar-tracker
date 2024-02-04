@@ -16,7 +16,7 @@
     "migrate:generate": "yarn typeorm -d dist/typeorm-cli.config.js migration:generate",
     "migrate:revert": "yarn typeorm -d dist/typeorm-cli.config.js migration:revert",
     "migrate:run:dev": "NODE_ENV=development yarn typeorm -d dist/typeorm-cli.config.js migration:run",
-    "migrate:run:prod": "NODE_ENV=production yarn typeorm -d /app/dist/typeorm-cli.config.js migration:run"
+    "migrate:run:prod": "NODE_ENV=production yarn typeorm -d dist/typeorm-cli.config.js migration:run"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
